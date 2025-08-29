@@ -9,3 +9,22 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
         
+model User {
+  id        Int     @id @default(autoincrement())
+  email     String  @unique
+  name      String?
+  posts     Post[]  // relation to posts
+  createdAt DateTime @default(now())
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // link to User
+  authorId  Int
+  author    User     @relation(fields: [authorId], references: [id])
+}
