@@ -37,14 +37,16 @@ export default function HomePage() {
                   <FileText size={16} />
                   Posts
                 </Link>
-{session ? (
+                {session ? (
                   <div className="flex items-center gap-4">
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href="/dashboard" className="flex items-center gap-2">
-                        <User size={16} />
-                        Dashboard
-                      </Link>
-                    </Button>
+                    {(session.user as any)?.role === "ADMIN" && (
+                      <Button variant="outline" size="sm" asChild>
+                        <Link href="/dashboard" className="flex items-center gap-2">
+                          <User size={16} />
+                          Dashboard
+                        </Link>
+                      </Button>
+                    )}
                     <LogoutButton />
                   </div>
                 ) : (
@@ -99,16 +101,18 @@ export default function HomePage() {
                   <div className="px-3 py-2">
                     {session ? (
                       <div className="space-y-2">
-                        <Button variant="outline" size="sm" asChild className="w-full bg-transparent">
-                          <Link
-                            href="/dashboard"
-                            className="flex items-center gap-2 justify-center"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                          >
-                            <User size={16} />
-                            Dashboard
-                          </Link>
-                        </Button>
+                        {(session.user as any)?.role === "ADMIN" && (
+                          <Button variant="outline" size="sm" asChild className="w-full bg-transparent">
+                            <Link
+                              href="/dashboard"
+                              className="flex items-center gap-2 justify-center"
+                              onClick={() => setIsMobileMenuOpen(false)}
+                            >
+                              <User size={16} />
+                              Dashboard
+                            </Link>
+                          </Button>
+                        )}
                         <div onClick={() => setIsMobileMenuOpen(false)}>
                           <LogoutButton />
                         </div>

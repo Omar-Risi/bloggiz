@@ -3,8 +3,12 @@ import { redirect } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { LogoutButton } from "@/components/logout-button"
-import { User, Calendar, Shield, AlertTriangle } from "lucide-react"
+import { CreatePostForm } from "@/components/create-post-form"
+import { PostsTable } from "@/components/posts-table"
+import { PostManagementProvider } from "@/components/post-management-context"
+import { User, Calendar, Shield } from "lucide-react"
 import Link from "next/link"
+import { prisma } from "@/lib/prisma"
 
 export default async function Dashboard() {
   const session = await auth()
@@ -15,31 +19,13 @@ export default async function Dashboard() {
 
   // Check if user is admin
   if ((session.user as any).role !== "ADMIN") {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card className="w-[400px]">
-          <CardHeader className="text-center">
-            <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
-            <CardTitle>Access Denied</CardTitle>
-          </CardHeader>
-          <CardContent className="text-center space-y-4">
-            <p className="text-muted-foreground">
-              You don't have permission to access the admin dashboard.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Only administrators can manage posts and access this area.
-            </p>
-            <div className="flex gap-2 justify-center">
-              <Button variant="outline" asChild>
-                <Link href="/">Go Home</Link>
-              </Button>
-              <LogoutButton />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    )
+    redirect("/")
   }
+
+  // Get published post count
+  const postCount = await (prisma as any).post.count({
+    where: { published: true }
+  })
 
   return (
     <div className="min-h-screen bg-background">
@@ -108,7 +94,7 @@ export default async function Dashboard() {
                 <User className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">2</div>
+                <div className="text-2xl font-bold">{postCount}</div>
                 <p className="text-xs text-muted-foreground">
                   Published articles
                 </p>
@@ -121,9 +107,6 @@ export default async function Dashboard() {
                 <CardTitle className="text-sm font-medium">Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Button size="sm" className="w-full">
-                  Create New Post
-                </Button>
                 <Button variant="outline" size="sm" className="w-full" asChild>
                   <Link href="/posts">View All Posts</Link>
                 </Button>
@@ -131,32 +114,16 @@ export default async function Dashboard() {
             </Card>
           </div>
 
-          {/* Auth Test Section */}
-          <Card className="mt-8">
-            <CardHeader>
-              <CardTitle>Authentication Test Results</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-green-50 dark:bg-green-950 rounded-lg">
-                  <span className="text-green-800 dark:text-green-200">✅ NextAuth.js Setup</span>
-                  <span className="text-green-600 dark:text-green-400">Working</span>
-                </div>
-                <div className="flex items-center justify-between p-4 bg-green-50 dark:bg-green-950 rounded-lg">
-                  <span className="text-green-800 dark:text-green-200">✅ Session Management</span>
-                  <span className="text-green-600 dark:text-green-400">Working</span>
-                </div>
-                <div className="flex items-center justify-between p-4 bg-green-50 dark:bg-green-950 rounded-lg">
-                  <span className="text-green-800 dark:text-green-200">✅ Protected Routes</span>
-                  <span className="text-green-600 dark:text-green-400">Working</span>
-                </div>
-                <div className="flex items-center justify-between p-4 bg-green-50 dark:bg-green-950 rounded-lg">
-                  <span className="text-green-800 dark:text-green-200">✅ Database Integration</span>
-                  <span className="text-green-600 dark:text-green-400">Working</span>
-                </div>
+          {/* Post Management Section */}
+          <div className="mt-8">
+            <h2 className="text-2xl font-bold text-foreground mb-4">Post Management</h2>
+            <PostManagementProvider>
+              <div className="space-y-6">
+                <CreatePostForm />
+                <PostsTable />
               </div>
-            </CardContent>
-          </Card>
+            </PostManagementProvider>
+          </div>
         </div>
       </main>
     </div>

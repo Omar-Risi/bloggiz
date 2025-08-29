@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma"
 
 export async function GET() {
   try {
-    const posts = await prisma.post.findMany({
+    const posts = await (prisma as any).post.findMany({
       where: { published: true },
       include: {
         author: {
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if slug already exists
-    const existingPost = await prisma.post.findUnique({
+    const existingPost = await (prisma as any).post.findUnique({
       where: { slug }
     })
 
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const post = await prisma.post.create({
+    const post = await (prisma as any).post.create({
       data: {
         title,
         content,
