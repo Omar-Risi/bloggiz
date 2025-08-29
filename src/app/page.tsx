@@ -2,12 +2,15 @@
 
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { Menu, X, Home, FileText, LogIn } from "lucide-react"
+import { Menu, X, Home, FileText, LogIn, User } from "lucide-react"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useSession } from "next-auth/react"
+import { LogoutButton } from "@/components/logout-button"
 
 export default function HomePage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { data: session } = useSession()
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -34,12 +37,24 @@ export default function HomePage() {
                   <FileText size={16} />
                   Posts
                 </Link>
-                <Button variant="outline" size="sm" asChild>
-                  <Link href="/login" className="flex items-center gap-2">
-                    <LogIn size={16} />
-                    Login
-                  </Link>
-                </Button>
+{session ? (
+                  <div className="flex items-center gap-4">
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href="/dashboard" className="flex items-center gap-2">
+                        <User size={16} />
+                        Dashboard
+                      </Link>
+                    </Button>
+                    <LogoutButton />
+                  </div>
+                ) : (
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href="/login" className="flex items-center gap-2">
+                      <LogIn size={16} />
+                      Login
+                    </Link>
+                  </Button>
+                )}
               </div>
             </div>
             <div className="md:hidden">
@@ -82,16 +97,34 @@ export default function HomePage() {
                     Posts
                   </Link>
                   <div className="px-3 py-2">
-                    <Button variant="outline" size="sm" asChild className="w-full bg-transparent">
-                      <Link
-                        href="/login"
-                        className="flex items-center gap-2 justify-center"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        <LogIn size={16} />
-                        Login
-                      </Link>
-                    </Button>
+                    {session ? (
+                      <div className="space-y-2">
+                        <Button variant="outline" size="sm" asChild className="w-full bg-transparent">
+                          <Link
+                            href="/dashboard"
+                            className="flex items-center gap-2 justify-center"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
+                            <User size={16} />
+                            Dashboard
+                          </Link>
+                        </Button>
+                        <div onClick={() => setIsMobileMenuOpen(false)}>
+                          <LogoutButton />
+                        </div>
+                      </div>
+                    ) : (
+                      <Button variant="outline" size="sm" asChild className="w-full bg-transparent">
+                        <Link
+                          href="/login"
+                          className="flex items-center gap-2 justify-center"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          <LogIn size={16} />
+                          Login
+                        </Link>
+                      </Button>
+                    )}
                   </div>
                 </motion.div>
               </motion.div>
